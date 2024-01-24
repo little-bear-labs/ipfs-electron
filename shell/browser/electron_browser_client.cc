@@ -120,6 +120,7 @@
 #include "third_party/blink/public/common/tokens/tokens.h"
 #include "third_party/blink/public/common/web_preferences/web_preferences.h"
 #include "third_party/blink/public/mojom/badging/badging.mojom.h"
+#include "third_party/ipfs_client/ipfs_buildflags.h"
 #include "ui/base/resource/resource_bundle.h"
 #include "ui/native_theme/native_theme.h"
 #include "v8/include/v8.h"
@@ -215,6 +216,12 @@
 #include "components/pdf/browser/pdf_url_loader_request_interceptor.h"
 #include "components/pdf/common/internal_plugin_helpers.h"
 #include "shell/browser/electron_pdf_document_helper_client.h"
+#endif
+
+#if BUILDFLAG(ENABLE_IPFS)
+#include "components/ipfs/interceptor.h"
+#include "components/ipfs/ipfs_features.h"
+#include "components/ipfs/url_loader_factory.h"
 #endif
 
 using content::BrowserThread;
@@ -830,7 +837,6 @@ ElectronBrowserClient::CreateBrowserMainParts(bool /* is_integration_test */) {
 #if BUILDFLAG(IS_MAC)
   browser_main_parts_ = browser_main_parts.get();
 #endif
-
   return browser_main_parts;
 }
 
@@ -905,7 +911,6 @@ void HandleExternalProtocolInUI(
     // transition.
     rfh = web_contents->GetPrimaryMainFrame();
   }
-
   GURL escaped_url(base::EscapeExternalHandlerValue(url.spec()));
   auto callback = base::BindOnce(&OnOpenExternal, escaped_url);
   permission_helper->RequestOpenExternalPermission(rfh, std::move(callback),
@@ -1196,6 +1201,18 @@ void ElectronBrowserClient::RegisterNonNetworkSubresourceURLLoaderFactories(
                        FileURLLoaderFactory::Create(render_process_id));
   }
 #endif
+#if BUILDFLAG(ENABLE_IPFS)
+  network::mojom::URLLoaderFactory* default_factory =
+      g_browser_process->system_network_context_manager()
+          ->GetURLLoaderFactory();
+  for (auto& iter : ElectronBrowserContext::browser_context_map()) {
+    auto& context = iter.second;
+    auto* prefs = context->prefs();
+    ipfs::IpfsURLLoaderFactory::Create(factories, context.get(),
+                                       default_factory,
+                                       GetSystemNetworkContext(), prefs);
+  }
+#endif  // BUILDFLAG(ENABLE_IPFS)
 }
 
 void ElectronBrowserClient::
@@ -1382,6 +1399,12 @@ ElectronBrowserClient::WillCreateURLLoaderRequestInterceptors(
     if (pdf_interceptor)
       interceptors.push_back(std::move(pdf_interceptor));
   }
+#endif
+#if BUILDFLAG(ENABLE_IPFS)
+  interceptors.push_back(std::make_unique<ipfs::Interceptor>(
+      g_browser_process->system_network_context_manager()
+          ->GetURLLoaderFactory(),
+      GetSystemNetworkContext()));
 #endif
   return interceptors;
 }

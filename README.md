@@ -1,4 +1,13 @@
+A fork of...
+
 [![Electron Logo](https://electronjs.org/images/electron-logo.svg)](https://electronjs.org)
+
+... with some IPFS functionality built in.
+
+See the upstream [here](https://github.com/electron/electron).
+
+
+
 
 [![CircleCI Build Status](https://circleci.com/gh/electron/electron/tree/main.svg?style=shield)](https://circleci.com/gh/electron/electron/tree/main)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/4lggi9dpjc1qob7k/branch/main?svg=true)](https://ci.appveyor.com/project/electron-bot/electron-ljo26/branch/main)

@@ -189,9 +189,8 @@ void RegisterSchemesAsPrivileged(gin_helper::ErrorThrower thrower,
 
 namespace {
 
-const char* const kBuiltinSchemes[] = {
-    "about", "file", "http", "https", "data", "filesystem",
-};
+const char* const kBuiltinSchemes[] = {"about", "file",       "http", "https",
+                                       "data",  "filesystem", "ipfs", "ipns"};
 
 // Convert error code to string.
 constexpr std::string_view ErrorCodeToString(ProtocolError error) {

@@ -25,6 +25,8 @@
 #include "chrome/browser/ui/color/chrome_color_mixers.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
+#include "components/ipfs/inter_request_state.h"
+#include "components/ipfs/ipfs_features.h"
 #include "components/os_crypt/sync/key_storage_config_linux.h"
 #include "components/os_crypt/sync/key_storage_util_linux.h"
 #include "components/os_crypt/sync/os_crypt.h"
@@ -65,6 +67,7 @@
 #include "shell/common/logging.h"
 #include "shell/common/node_bindings.h"
 #include "shell/common/node_includes.h"
+#include "third_party/ipfs_client/ipfs_buildflags.h"
 #include "ui/base/idle/idle.h"
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/ui_base_switches.h"
@@ -488,7 +491,13 @@ int ElectronBrowserMainParts::PreMainMessageLoopRun() {
   Browser::Get()->PreMainMessageLoopRun();
 
   fake_browser_process_->PreMainMessageLoopRun();
-
+  for (auto& iter : ElectronBrowserContext::browser_context_map()) {
+    LOG(INFO) << "Attempt to initialize IPFS state for context keyed on '"
+              << iter.first.location << "' " << iter.first.in_memory;
+    auto& context = iter.second;
+    ipfs::InterRequestState::CreateForBrowserContext(context.get(),
+                                                     context->prefs());
+  }
   return GetExitCode();
 }
 

@@ -19,6 +19,7 @@
 #include "base/strings/string_util.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/pref_names.h"
+#include "components/ipfs/preferences.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/prefs/json_pref_store.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -350,6 +351,8 @@ void ElectronBrowserContext::InitPrefs() {
 
   language::LanguagePrefs::RegisterProfilePrefs(registry.get());
 #endif
+
+  ipfs::RegisterPreferences(registry.get());
 
   prefs_ = prefs_factory.Create(registry.get());
 #if BUILDFLAG(ENABLE_ELECTRON_EXTENSIONS) || \

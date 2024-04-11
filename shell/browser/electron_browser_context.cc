@@ -21,6 +21,7 @@
 #include "chrome/common/pref_names.h"
 #include "components/ipfs/preferences.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
+#include "components/ipfs/inter_request_state.h"
 #include "components/prefs/json_pref_store.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -826,6 +827,7 @@ ElectronBrowserContext* ElectronBrowserContext::From(
                                                  in_memory, std::move(options));
   browser_context_map()[key] =
       std::unique_ptr<ElectronBrowserContext>(new_context);
+  ipfs::InterRequestState::CreateForBrowserContext(new_context, new_context->prefs());
   return new_context;
 }
 

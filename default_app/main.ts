@@ -257,7 +257,7 @@ if (option.file && !option.webdriver) {
   const file = option.file;
   const protocol = url.parse(file).protocol;
   const extension = path.extname(file);
-  if (protocol === 'http:' || protocol === 'https:' || protocol === 'file:' || protocol === 'chrome:') {
+  if (protocol === 'http:' || protocol === 'https:' || protocol === 'file:' || protocol === 'chrome:' || protocol === 'ipfs:' || protocol === 'ipns:') {
     await loadApplicationByURL(file);
   } else if (extension === '.html' || extension === '.htm') {
     await loadApplicationByFile(path.resolve(file));

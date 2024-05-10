@@ -11,6 +11,7 @@ import("//printing/buildflags/buildflags.gni")
 import("//testing/test.gni")
 import("//third_party/electron_node/node.gni")
 import("//third_party/ffmpeg/ffmpeg_options.gni")
+import("//third_party/ipfs_client/args.gni")
 import("//tools/generate_library_loader/generate_library_loader.gni")
 import("//tools/grit/grit_rule.gni")
 import("//tools/grit/repack.gni")
@@ -671,6 +672,10 @@ source_set("electron_lib") {
       "//sandbox/win:sandbox",
       "//third_party/crashpad/crashpad/handler",
     ]
+  }
+
+  if (enable_ipfs) {
+    deps += [ "//components/ipfs" ]
   }
 
   if (enable_plugins) {

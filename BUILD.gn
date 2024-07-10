@@ -406,7 +406,7 @@ action("electron_generate_node_defines") {
   args = [ rebase_path(target_gen_dir) ] + rebase_path(inputs)
 }
 
-spin_defines = exec_script("build/spin.py")
+spin_defines = exec_script("build/spin.py", [], "list lines")
 
 source_set("electron_lib") {
   configs += [
@@ -561,7 +561,7 @@ source_set("electron_lib") {
     ]
   }
   if (spin_defines != []) {
-    deps += ["//electron-spin"]
+    deps += [ "//electron-spin:electron_hooks" ]
   }
   if (is_mac) {
     deps += [

@@ -180,6 +180,13 @@
 #include "shell/browser/extensions/electron_extension_web_contents_observer.h"
 #endif
 
+#ifdef ELECTRON_SPIN_INTERCEPTORS
+#include "electron-spin/interceptors.h"
+#endif
+#ifdef ELECTRON_SPIN_SCHEME_URL_LOADER
+#include "electron-spin/scheme_url_loader.h"
+#endif
+
 #if BUILDFLAG(ENABLE_PLUGINS)
 #include "chrome/browser/plugins/plugin_response_interceptor_url_loader_throttle.h"  // nogncheck
 #include "shell/browser/plugins/plugin_utils.h"
@@ -1199,6 +1206,18 @@ void ElectronBrowserClient::RegisterNonNetworkSubresourceURLLoaderFactories(
                        FileURLLoaderFactory::Create(render_process_id));
   }
 #endif
+#ifdef ELECTRON_SPIN_SCHEME_URL_LOADER
+  network::mojom::URLLoaderFactory* default_factory =
+      g_browser_process->system_network_context_manager()
+          ->GetURLLoaderFactory();
+  for (auto& iter : ElectronBrowserContext::browser_context_map()) {
+    auto& context = iter.second;
+    auto* prefs = context->prefs();
+    electron_spin::CreateLoaderFactories(factories, context.get(),
+                                         default_factory,
+                                         GetSystemNetworkContext(), prefs);
+  }
+#endif
 }
 
 void ElectronBrowserClient::
@@ -1381,6 +1400,13 @@ ElectronBrowserClient::WillCreateURLLoaderRequestInterceptors(
     if (pdf_interceptor)
       interceptors.push_back(std::move(pdf_interceptor));
   }
+#endif
+#ifdef ELECTRON_SPIN_INTERCEPTORS
+  electron_spin::AddInterceptors(
+      interceptors,
+      g_browser_process->system_network_context_manager()
+          ->GetURLLoaderFactory(),
+      GetSystemNetworkContext());
 #endif
   return interceptors;
 }

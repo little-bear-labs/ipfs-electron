@@ -116,6 +116,10 @@
 #include "shell/common/extensions/electron_extensions_client.h"
 #endif  // BUILDFLAG(ENABLE_ELECTRON_EXTENSIONS)
 
+#ifdef ELECTRON_SPIN_PRE_MAIN_MESSAGE_LOOP_RUN
+#include "electron-spin/pre_main_message_loop_run.h"
+#endif
+
 #if BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER)
 #include "chrome/browser/spellchecker/spellcheck_factory.h"  // nogncheck
 #endif
@@ -482,6 +486,13 @@ int ElectronBrowserMainParts::PreMainMessageLoopRun() {
   Browser::Get()->PreMainMessageLoopRun();
 
   fake_browser_process_->PreMainMessageLoopRun();
+
+#ifdef ELECTRON_SPIN_PRE_MAIN_MESSAGE_LOOP_RUN
+  for (auto& iter : ElectronBrowserContext::browser_context_map()) {
+    auto c = iter.second.get();
+    electron_spin::PreMainMessageLoopRun(c, c->prefs());
+  }
+#endif
 
   return GetExitCode();
 }

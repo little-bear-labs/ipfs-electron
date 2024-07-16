@@ -4,7 +4,7 @@ name: Update AppVeyor Image
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * 1-5' # runs 8:00 every business day (see https://crontab.guru)
+    #- cron: '0 8 * * 1-5' # runs 8:00 every business day (see https://crontab.guru)
 
 permissions:
   contents: write

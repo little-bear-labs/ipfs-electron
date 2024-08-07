@@ -79,6 +79,10 @@
 #include "shell/common/extensions/electron_extensions_client.h"
 #endif  // BUILDFLAG(ENABLE_ELECTRON_EXTENSIONS)
 
+#if ELECTRON_SPIN_PREFERENCES
+#include "electron-spin/preferences.h"
+#endif
+
 #if BUILDFLAG(ENABLE_ELECTRON_EXTENSIONS) || \
     BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER)
 #include "components/pref_registry/pref_registry_syncable.h"
@@ -356,6 +360,10 @@ void ElectronBrowserContext::InitPrefs() {
   if (!in_memory_)
     extensions::ExtensionPrefs::RegisterProfilePrefs(registry.get());
   extensions::PermissionsManager::RegisterProfilePrefs(registry.get());
+#endif
+
+#ifdef ELECTRON_SPIN_PREFERENCES
+  electron_spin::RegisterPreferences(registry.get());
 #endif
 
 #if BUILDFLAG(ENABLE_BUILTIN_SPELLCHECKER)

@@ -25,6 +25,10 @@
 #include "shell/common/process_util.h"
 #include "url/url_util.h"
 
+#ifdef ELECTRON_SPIN_ADDITIONAL_SCHEMES
+#include "electron-spin/additional_schemes.h"
+#endif
+
 namespace {
 
 // List of registered custom standard schemes.
@@ -272,7 +276,11 @@ v8::Local<v8::Promise> Protocol::IsProtocolHandled(const std::string& scheme,
           // So we have to test against a hard-coded builtin schemes
           // list make it work with old code. We should deprecate
           // this API with the new |isProtocolRegistered| API.
-          base::Contains(kBuiltinSchemes, scheme));
+          base::Contains(kBuiltinSchemes, scheme)
+#ifdef ELECTRON_SPIN_ADDITIONAL_SCHEMES
+          || base::Contains(electron_spin::AdditionalSchemes(), scheme)
+#endif
+  );
 }
 
 void Protocol::HandleOptionalCallback(gin::Arguments* args,

@@ -406,6 +406,8 @@ action("electron_generate_node_defines") {
   args = [ rebase_path(target_gen_dir) ] + rebase_path(inputs)
 }
 
+spin_defines = exec_script("build/spin.py", [], "list lines")
+
 source_set("electron_lib") {
   configs += [
     "//v8:external_startup_data",
@@ -515,7 +517,7 @@ source_set("electron_lib") {
     "//third_party/blink/renderer",
   ]
 
-  defines = [ "V8_DEPRECATION_WARNINGS" ]
+  defines = [ "V8_DEPRECATION_WARNINGS" ] + spin_defines
   libs = []
 
   if (is_linux) {
@@ -558,7 +560,9 @@ source_set("electron_lib") {
       "shell/browser/fake_location_provider.h",
     ]
   }
-
+  if (spin_defines != []) {
+    deps += [ "//electron-spin:electron_hooks" ]
+  }
   if (is_mac) {
     deps += [
       "//components/remote_cocoa/app_shim",
